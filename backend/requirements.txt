@@ -1,0 +1,10 @@
+flask
+python-dotenv
+flask-mail
+flask-migrate
+flask-cors
+flask-sqlalchemy
+requests
+PyJWT
+google-generativeai
+Werkzeug
