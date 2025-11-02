@@ -1,0 +1,116 @@
+/* ---------------------- General container ---------------------- */
+.container {
+  max-width: 1700px;
+  margin: auto;
+  padding: 24px;
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  background-color: #0f1724; /* dark background */
+  color: #d1d5db;
+}
+
+.center { text-align: center; }
+
+.error { color: #ff6b6b; font-weight: bold; margin: 20px 0; }
+
+/* ---------------------- Title ---------------------- */
+h1 {
+  text-align: left;
+  margin-bottom: 18px;
+  color: #e6eef8;
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+/* Dashboard specific layout */
+.dashboard { display: grid; grid-template-columns: 1fr 360px; gap: 20px; }
+.main-column { display: flex; flex-direction: column; gap: 18px; }
+.metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+
+.metric-card {
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.05));
+  padding: 18px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.04);
+  box-shadow: 0 6px 18px rgba(2,6,23,0.6);
+}
+.metric-card h4 { margin: 0 0 8px 0; color: #9fb3d6; font-size: 0.9rem; font-weight: 600; }
+.metric-value { font-size: 1.6rem; color: #fff; font-weight: 700; }
+
+.recent-panel { background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(0,0,0,0.02)); padding: 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.04); min-height: 420px; }
+.feed-panel { background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(0,0,0,0.02)); padding: 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.04); height: 100%; }
+
+.controls { display: flex; gap: 12px; margin-bottom: 12px; align-items: center; justify-content: flex-start; flex-wrap: wrap; }
+.controls input, .controls select { padding: 10px 12px; font-size: 14px; border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; outline: none; background: rgba(255,255,255,0.02); color: #e6eef8; }
+.controls input::placeholder { color: rgba(230,238,248,0.45); }
+.controls input:focus, .controls select:focus { border-color: rgba(99,102,241,0.9); box-shadow: 0 6px 18px rgba(99,102,241,0.06); }
+
+/* ---------------------- Grid layout ---------------------- */
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+
+/* ---------------------- ThreatCard base ---------------------- */
+.threat-card { width: auto; padding: 18px; border-radius: 10px; background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02)); border: 1px solid rgba(255,255,255,0.04); box-shadow: 0 6px 20px rgba(2,6,23,0.6); transition: transform 0.18s, box-shadow 0.18s; overflow-wrap: break-word; white-space: normal; word-wrap: break-word; }
+.threat-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); }
+.threat-card h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 8px; color: #e6eef8; }
+.threat-card p { margin: 6px 0; color: #c7d2e6; font-size: 14px; }
+.threat-card p b { color: #cbd5e1; }
+
+.threat-card.low { border-left: 6px solid #44bd32; }
+.threat-card.medium { border-left: 6px solid #e1b12c; }
+.threat-card.high { border-left: 6px solid #e84118; }
+
+.badge { display: inline-block; padding: 6px 12px; border-radius: 15px; font-size: 14px; font-weight: bold; margin-top: 10px; }
+.badge.low { background: #44bd32; color: white; }
+.badge.medium { background: #e1b12c; color: black; }
+.badge.high { background: #e84118; color: white; }
+
+.timestamp { font-size: 13px; color: #9aa4b2; margin-top: 8px; }
+
+.user-table { width: 100%; border-collapse: collapse; margin: 20px auto; background-color: rgba(255,255,255,0.02); border-radius: 8px; overflow: hidden; }
+.user-table thead { background-color: rgba(255,255,255,0.02); color: #cbd5e1; }
+.user-table th, .user-table td { padding: 12px 14px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 14px; color: #cbd5e1; }
+.user-table th { font-weight: 700; text-transform: uppercase; font-size: 12px; letter-spacing: 0.6px; }
+.user-table tbody tr:hover { background-color: rgba(255,255,255,0.02); cursor: pointer; }
+.user-table tbody tr:last-child td { border-bottom: none; }
+
+/* ---------------------- Login Container (kept from original) ---------------------- */
+.login-container { max-width: 400px; margin: 80px auto; padding: 30px; background: rgba(255,255,255,0.95); border-radius: 12px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2); text-align: center; }
+.login-container h2 { margin-bottom: 20px; color: #2c3e50; font-size: 1.8rem; font-weight: bold; }
+.login-container input { width: 90%; padding: 12px 15px; margin: 10px 0; border: 1px solid #ccc; border-radius: 6px; font-size: 15px; outline: none; transition: border-color 0.3s, box-shadow 0.3s; }
+.login-container input:focus { border-color: #4cd137; box-shadow: 0 0 6px rgba(76, 209, 55, 0.4); }
+.login-container button { width: 100%; padding: 12px; margin-top: 10px; background: #2ecc71; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; transition: background 0.3s, transform 0.2s; }
+.login-container button:hover { background: #27ae60; transform: translateY(-2px); }
+
+/* Small utilities */
+.center { text-align: center; }
+.error { color: #ff6b6b; }
+
+/* Full page background */
+.login-page { height: 100vh; display: flex; justify-content: center; align-items: center; background: url("./assets/loginpage.gif") no-repeat center center fixed; background-size: cover; }
+
+.login-container { max-width: 400px; margin: 80px auto; padding: 30px; background: rgba(255, 255, 255, 0.9); border-radius: 12px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2); text-align: center; }
+
+
+/* Full page background */
+
+/* Background only for login page */
+.login-page {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: url("./assets/loginpage.gif") no-repeat center center fixed;
+  background-size: cover;
+}
+
+
+.login-container {
+  max-width: 400px;
+  margin: 80px auto;
+  padding: 30px;
+  background: rgba(255, 255, 255, 0.9); /* semi-transparent */
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+

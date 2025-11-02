@@ -1,0 +1,41 @@
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+venv/
+ENV/
+.env
+.env.*
+
+# Databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Instance folders
+instance/
+backend/instance/
+
+# Secrets and keys
+*.key
+*.pem
+credentials*
+*secret*
+*_credentials*
+
+# Editor/IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Frontend build / deps
+node_modules/
+frontend/build/
+
+# OS files
+Thumbs.db
+*.exe
+*.dll
