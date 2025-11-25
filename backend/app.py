@@ -27,8 +27,14 @@ app = Flask(__name__)
 # CORS config: restrict to local dev origins so browsers will accept credentials headers correctly.
 # Using explicit origins prevents the browser from rejecting Access-Control-Allow-Credentials.
 CORS(app,
-    resources={r"/api/*": {"origins": ["http://localhost:3000", "http://127.0.0.1:3000"]}},
-    supports_credentials=False,
+    resources={r"/api/*": {"origins": [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://localhost:3001",
+        "http://127.0.0.1:3001"
+    ]}},
+    # Allow credentials during local development (cookies/authorization headers)
+    supports_credentials=True,
     expose_headers=["X-ADMIN-KEY"],
     allow_headers=["Content-Type", "Authorization", "X-ADMIN-KEY"])
 
