@@ -16,9 +16,53 @@ import jwt  # This should now work with PyJWT after reinstalling
 from datetime import datetime, timedelta
 from functools import wraps
 
-# Import summarizer + scorer
-from summarizer import summarize_threat, init_client as init_summarizer
-from scorer import score_threat, init_client as init_scorer
+# Summarizer + scorer: lazy-loaded to avoid heavy imports at startup (dev machines)
+# Provide safe fallbacks until the real implementations are imported and initialized.
+summarize_threat = lambda *a, **k: "Summary unavailable"
+score_threat = lambda *a, **k: 0
+init_summarizer = lambda *a, **k: None
+init_scorer = lambda *a, **k: None
+_summarizer_initialized = False
+_scorer_initialized = False
+
+def _ensure_summarizer():
+    global summarize_threat, init_summarizer, _summarizer_initialized
+    if _summarizer_initialized:
+        return
+    try:
+        # Import at first use to avoid startup delays / native extension loads
+        from summarizer import summarize_threat as _summ, init_client as _init_summ
+        summarize_threat = _summ
+        init_summarizer = _init_summ
+        if GEMINI_API_KEY:
+            try:
+                init_summarizer(GEMINI_API_KEY)
+            except Exception as _ie:
+                print(f"Warning: failed to initialize summarizer client: {_ie}")
+        print("Summarizer module loaded")
+    except Exception as e:
+        print(f"Warning: could not import summarizer module: {e}")
+        summarize_threat = lambda *a, **k: "Summary unavailable"
+    _summarizer_initialized = True
+
+def _ensure_scorer():
+    global score_threat, init_scorer, _scorer_initialized
+    if _scorer_initialized:
+        return
+    try:
+        from scorer import score_threat as _score, init_client as _init_scorer
+        score_threat = _score
+        init_scorer = _init_scorer
+        if GEMINI_API_KEY:
+            try:
+                init_scorer(GEMINI_API_KEY)
+            except Exception as _ie:
+                print(f"Warning: failed to initialize scorer client: {_ie}")
+        print("Scorer module loaded")
+    except Exception as e:
+        print(f"Warning: could not import scorer module: {e}")
+        score_threat = lambda *a, **k: 0
+    _scorer_initialized = True
 
 # ---------------- SETUP ----------------
 load_dotenv()
@@ -446,6 +490,8 @@ def get_threats():
 
                 # Generate summaries (short + detailed) and score (AI fallback handled inside functions)
                 try:
+                    _ensure_summarizer()
+                    _ensure_scorer()
                     summary_short = summarize_threat(i, pulse_title=pulse_title, detail="short")
                     summary_detailed = summarize_threat(i, pulse_title=pulse_title, detail="detailed")
                     score = score_threat(indicator_value, pulse_title)
@@ -656,8 +702,9 @@ def send_notification(current_user):
                     chosen_summary = persisted.summary_short or persisted.summary
             else:
                 try:
-                    detail = 'detailed' if is_subscribed else 'short'
-                    chosen_summary = summarize_threat(threat, pulse_title=threat.get('title', ''), detail=detail)
+                        _ensure_summarizer()
+                        detail = 'detailed' if is_subscribed else 'short'
+                        chosen_summary = summarize_threat(threat, pulse_title=threat.get('title', ''), detail=detail)
                 except Exception:
                     chosen_summary = threat.get('summary', 'Summary unavailable')
         else:
