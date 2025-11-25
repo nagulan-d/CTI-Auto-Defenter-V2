@@ -10,6 +10,7 @@ import requests
 import os
 from dotenv import load_dotenv
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import text
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt  # This should now work with PyJWT after reinstalling
 from datetime import datetime, timedelta
@@ -651,9 +652,10 @@ def send_notification(current_user):
         personalized_body += f"A threat notification has been sent:\n\n📛 Title: {threat.get('title', 'N/A')}\n🔍 Indicator: {threat.get('indicator', 'N/A')}\n📈 Score: {threat.get('score', 'N/A')}\n📝 Summary: {chosen_summary}\n🕒 Timestamp: {threat.get('timestamp', 'N/A')}\n\n— Threat Intelligence System\n"
 
         if send_email_notification(user_email, personalized_subject, personalized_body):
-            return jsonify({"message": "Notification sent successfully"}), 200
+            return jsonify({"message": "Notification sent successfully", "sent": 1, "failed": 0}), 200
         else:
-            return jsonify({"error": "Failed to send notification"}), 500
+            # Don't return a hard 500 for delivery failure — return a 200 with failure details
+            return jsonify({"message": "Failed to send notification (delivery error)", "sent": 0, "failed": 1}), 200
     except Exception as e:
         import traceback
         tb = traceback.format_exc()
@@ -737,12 +739,13 @@ if __name__ == "__main__":
                 try:
                     cols = [c['name'] for c in inspector.get_columns('user')]
                     if 'subscribed' not in cols:
-                        # add column for sqlite
-                        try:
-                            db.engine.execute('ALTER TABLE user ADD COLUMN subscribed BOOLEAN DEFAULT 0')
-                            print('Added subscribed column to user table')
-                        except Exception as _e:
-                            print('Failed to add subscribed column via ALTER TABLE:', _e)
+                            # add column for sqlite using SQLAlchemy 2.x compatible API
+                            try:
+                                with db.engine.begin() as conn:
+                                    conn.execute(text('ALTER TABLE user ADD COLUMN subscribed BOOLEAN DEFAULT 0'))
+                                print('Added subscribed column to user table')
+                            except Exception as _e:
+                                print('Failed to add subscribed column via ALTER TABLE:', _e)
                 except Exception:
                     pass
 
@@ -752,19 +755,22 @@ if __name__ == "__main__":
                         threat_cols = [c['name'] for c in inspector.get_columns('threat')]
                         if 'summary_short' not in threat_cols:
                             try:
-                                db.engine.execute("ALTER TABLE threat ADD COLUMN summary_short TEXT")
+                                with db.engine.begin() as conn:
+                                    conn.execute(text("ALTER TABLE threat ADD COLUMN summary_short TEXT"))
                                 print('Added summary_short column to threat table')
                             except Exception as _e:
                                 print('Failed to add summary_short column via ALTER TABLE:', _e)
                         if 'summary_detailed' not in threat_cols:
                             try:
-                                db.engine.execute("ALTER TABLE threat ADD COLUMN summary_detailed TEXT")
+                                with db.engine.begin() as conn:
+                                    conn.execute(text("ALTER TABLE threat ADD COLUMN summary_detailed TEXT"))
                                 print('Added summary_detailed column to threat table')
                             except Exception as _e:
                                 print('Failed to add summary_detailed column via ALTER TABLE:', _e)
                         if 'summary' not in threat_cols:
                             try:
-                                db.engine.execute("ALTER TABLE threat ADD COLUMN summary TEXT")
+                                with db.engine.begin() as conn:
+                                    conn.execute(text("ALTER TABLE threat ADD COLUMN summary TEXT"))
                                 print('Added summary column to threat table')
                             except Exception as _e:
                                 print('Failed to add summary column via ALTER TABLE:', _e)
