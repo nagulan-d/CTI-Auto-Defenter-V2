@@ -1,0 +1,22 @@
+.landing-root {
+  height: 100vh;
+  width: 100%;
+  background: #ffffff;
+  position: relative;
+}
+
+.get-started-button {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  background: #1f6feb;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.get-started-button:hover {
+  background: #165fd6;
+}

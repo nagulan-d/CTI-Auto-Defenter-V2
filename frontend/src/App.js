@@ -12,6 +12,7 @@ function AnimatedRoutes({ token, role, handleLogin, handleLogout }) {
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
+        <Route path="/login" element={<Login onLogin={handleLogin} />} />
         {/* Root Route */}
         <Route
           path="/"
@@ -19,7 +20,7 @@ function AnimatedRoutes({ token, role, handleLogin, handleLogout }) {
             // If there's no token or no role, show the login page.
             // This prevents redirect loops when a token exists but role is missing.
             !token || !role ? (
-              <Login onLogin={handleLogin} />
+              <Landing />
             ) : role === "admin" ? (
               <Navigate to="/admin" />
             ) : (
@@ -38,7 +39,7 @@ function AnimatedRoutes({ token, role, handleLogin, handleLogout }) {
             token && role === "user" ? (
               <ThreatDashboard token={token} logout={handleLogout} />
             ) : (
-              <Navigate to="/" />
+              <Navigate to="/login" />
             )
           }
         />
@@ -50,7 +51,7 @@ function AnimatedRoutes({ token, role, handleLogin, handleLogout }) {
             token && role === "admin" ? (
               <AdminDashboard token={token} logout={handleLogout} />
             ) : (
-              <Navigate to="/" />
+              <Navigate to="/login" />
             )
           }
         />
