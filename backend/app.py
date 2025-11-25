@@ -234,7 +234,12 @@ def home():
 
 # --- Register New User ---
 @app.route("/api/register", methods=["POST", "OPTIONS"])
-@cross_origin(origins=["http://localhost:3000", "http://127.0.0.1:3000"])  # explicit dev origins
+@cross_origin(origins=[
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:3001",
+    "http://127.0.0.1:3001"
+])  # explicit dev origins
 def register():
     try:
         # Dev debug: log incoming headers and raw body to help diagnose CORS/JSON parsing issues
@@ -503,7 +508,12 @@ def get_threats():
 
 # --- New Endpoint: Manual Email Notification (Admin Only) ---
 @app.route("/api/send-notification", methods=["POST", "OPTIONS"])
-@cross_origin(origins=["http://localhost:3000", "http://127.0.0.1:3000"], methods=["POST", "OPTIONS"])
+@cross_origin(origins=[
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:3001",
+    "http://127.0.0.1:3001"
+], methods=["POST", "OPTIONS"])
 @token_required
 def send_notification(current_user):
     try:
