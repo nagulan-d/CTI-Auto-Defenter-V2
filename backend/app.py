@@ -48,9 +48,12 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["MAIL_SERVER"] = os.getenv("MAIL_SERVER", "smtp.gmail.com")
 app.config["MAIL_PORT"] = int(os.getenv("MAIL_PORT", 587))
 app.config["MAIL_USE_TLS"] = os.getenv("MAIL_USE_TLS", "True").lower() == "true"
-app.config["MAIL_USERNAME"] = os.getenv("MAIL_USERNAME")
-app.config["MAIL_PASSWORD"] = os.getenv("MAIL_PASSWORD")
+# Trim credentials to avoid trailing-newline issues from .env files
+app.config["MAIL_USERNAME"] = (os.getenv("MAIL_USERNAME") or "").strip()
+app.config["MAIL_PASSWORD"] = (os.getenv("MAIL_PASSWORD") or "").strip()
 app.config["MAIL_DEFAULT_SENDER"] = app.config["MAIL_USERNAME"]
+# Dev toggle: set MAIL_DISABLE=true to skip real email sending (useful for local dev)
+MAIL_DISABLE = os.getenv("MAIL_DISABLE", "False").lower() in ("1", "true", "yes")
 
 mail = Mail(app)
 
@@ -135,13 +138,27 @@ class Threat(db.Model):
 # ---------------- EMAIL FUNCTION ----------------
 def send_email_notification(to_email, subject, body):
     try:
+        if MAIL_DISABLE:
+            print(f"MAIL_DISABLE is set — skipping real send. Would have sent to {to_email}")
+            print("Subject:", subject)
+            print("Body:\n", body)
+            return True
+
         msg = Message(subject=subject, recipients=[to_email])
         msg.body = body
         mail.send(msg)
         print(f"✅ Email sent successfully to {to_email}")
         return True
     except Exception as e:
-        print(f"❌ Failed to send email to {to_email}: {e}")
+        # Provide clearer output for authentication failures and other SMTP errors
+        try:
+            import smtplib
+            if isinstance(e, smtplib.SMTPAuthenticationError):
+                print(f"❌ SMTP Authentication failed for {app.config.get('MAIL_USERNAME')}: {e}")
+            else:
+                print(f"❌ Failed to send email to {to_email}: {e}")
+        except Exception:
+            print(f"❌ Failed to send email to {to_email}: {e}")
         return False
 
 
