@@ -658,6 +658,24 @@ def send_notification(current_user):
         import traceback
         tb = traceback.format_exc()
         print(tb)
+        # Persist error details to a file to aid debugging in local dev
+        try:
+            with open('send_notification_error.log', 'a', encoding='utf-8') as f:
+                f.write('\n--- /api/send-notification error ---\n')
+                try:
+                    f.write('Headers:\n' + str(dict(request.headers)) + '\n')
+                except Exception:
+                    f.write('Could not read headers\n')
+                try:
+                    f.write('Body:\n' + (request.get_data(as_text=True) or '') + '\n')
+                except Exception:
+                    f.write('Could not read body\n')
+                f.write('Traceback:\n')
+                f.write(tb + '\n')
+        except Exception as _write_err:
+            print('Failed to write send_notification_error.log:', _write_err)
+
+        # Return a little more info in development so the frontend can show a helpful message
         return jsonify({"error": "Internal server error", "details": str(e)}), 500
 
 
