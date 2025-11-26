@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from 'react-router-dom';
 import ThreatCard from "./ThreatCardNew";
 import "../App.css";
 
@@ -13,6 +14,7 @@ function ThreatDashboard({ logout }) {
   const [filter, setFilter] = useState("all");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const username = localStorage.getItem('username') || '';
+  const navigate = useNavigate();
 
   // Fetch threats from backend
   useEffect(() => {
@@ -86,13 +88,25 @@ function ThreatDashboard({ logout }) {
         </div>
 
         <nav style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 14 }}>
-          <button style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', borderRadius: 6, background: 'transparent', color: '#fff', border: 'none', cursor: 'pointer' }}>
+          <button onClick={() => navigate('/dashboard')} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', borderRadius: 6, background: 'transparent', color: '#fff', border: 'none', cursor: 'pointer' }}>
             <span style={{ width: 18, textAlign: 'center' }}>🏠</span>
             {sidebarOpen && <span>Overview</span>}
           </button>
-          <button style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', borderRadius: 6, background: 'transparent', color: '#fff', border: 'none', cursor: 'pointer' }}>
+          <button onClick={() => navigate('/threats')} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', borderRadius: 6, background: 'transparent', color: '#fff', border: 'none', cursor: 'pointer' }}>
             <span style={{ width: 18, textAlign: 'center' }}>⚠️</span>
             {sidebarOpen && <span>Threats</span>}
+          </button>
+          <button onClick={() => navigate('/sites')} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', borderRadius: 6, background: 'transparent', color: '#fff', border: 'none', cursor: 'pointer' }}>
+            <span style={{ width: 18, textAlign: 'center' }}>🗂️</span>
+            {sidebarOpen && <span>Sites</span>}
+          </button>
+          <button onClick={() => navigate('/publish')} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', borderRadius: 6, background: 'transparent', color: '#fff', border: 'none', cursor: 'pointer' }}>
+            <span style={{ width: 18, textAlign: 'center' }}>🚀</span>
+            {sidebarOpen && <span>Publish</span>}
+          </button>
+          <button onClick={() => navigate('/analytics')} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', borderRadius: 6, background: 'transparent', color: '#fff', border: 'none', cursor: 'pointer' }}>
+            <span style={{ width: 18, textAlign: 'center' }}>📊</span>
+            {sidebarOpen && <span>Analytics</span>}
           </button>
         </nav>
 

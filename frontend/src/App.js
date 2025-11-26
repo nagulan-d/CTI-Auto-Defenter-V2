@@ -5,6 +5,17 @@ import Login from "./components/Login";
 import Register from "./components/Register";
 import ThreatDashboard from "./components/ThreatDashboard";
 import AdminDashboard from "./components/AdminDashboard";
+import SitesPage from "./pages/SitesPage";
+import PublishPage from "./pages/PublishPage";
+import ContentPage from "./pages/ContentPage";
+import AnalyticsPage from "./pages/AnalyticsPage";
+import SubscriptionsPage from "./pages/SubscriptionsPage";
+import IntegrationsPage from "./pages/IntegrationsPage";
+import FilesPage from "./pages/FilesPage";
+import ProfilePage from "./pages/ProfilePage";
+import NotificationsPage from "./pages/NotificationsPage";
+import SettingsPage from "./pages/SettingsPage";
+import SupportPage from "./pages/SupportPage";
 
 function AnimatedRoutes({ token, role, handleLogin, handleLogout }) {
   const location = useLocation();
@@ -12,7 +23,6 @@ function AnimatedRoutes({ token, role, handleLogin, handleLogout }) {
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
-        <Route path="/login" element={<Login onLogin={handleLogin} />} />
         {/* Root Route */}
         <Route
           path="/"
@@ -20,11 +30,23 @@ function AnimatedRoutes({ token, role, handleLogin, handleLogout }) {
             // If there's no token or no role, show the login page.
             // This prevents redirect loops when a token exists but role is missing.
             !token || !role ? (
-              <Landing />
+              <Login onLogin={handleLogin} />
             ) : role === "admin" ? (
               <Navigate to="/admin" />
             ) : (
               <Navigate to="/dashboard" />
+            )
+          }
+        />
+
+        {/* Threats direct route */}
+        <Route
+          path="/threats"
+          element={
+            token && role === "user" ? (
+              <ThreatDashboard token={token} logout={handleLogout} />
+            ) : (
+              <Navigate to="/" />
             )
           }
         />
@@ -39,9 +61,55 @@ function AnimatedRoutes({ token, role, handleLogin, handleLogout }) {
             token && role === "user" ? (
               <ThreatDashboard token={token} logout={handleLogout} />
             ) : (
-              <Navigate to="/login" />
+              <Navigate to="/" />
             )
           }
+        />
+
+        {/* Additional user pages */}
+        <Route
+          path="/sites"
+          element={token && role === "user" ? <SitesPage /> : <Navigate to="/" />}
+        />
+        <Route
+          path="/publish"
+          element={token && role === "user" ? <PublishPage /> : <Navigate to="/" />}
+        />
+        <Route
+          path="/content"
+          element={token && role === "user" ? <ContentPage /> : <Navigate to="/" />}
+        />
+        <Route
+          path="/analytics"
+          element={token && role === "user" ? <AnalyticsPage /> : <Navigate to="/" />}
+        />
+        <Route
+          path="/subscriptions"
+          element={token && role === "user" ? <SubscriptionsPage /> : <Navigate to="/" />}
+        />
+        <Route
+          path="/integrations"
+          element={token && role === "user" ? <IntegrationsPage /> : <Navigate to="/" />}
+        />
+        <Route
+          path="/files"
+          element={token && role === "user" ? <FilesPage /> : <Navigate to="/" />}
+        />
+        <Route
+          path="/profile"
+          element={token ? <ProfilePage /> : <Navigate to="/" />}
+        />
+        <Route
+          path="/notifications"
+          element={token ? <NotificationsPage /> : <Navigate to="/" />}
+        />
+        <Route
+          path="/settings"
+          element={token ? <SettingsPage /> : <Navigate to="/" />}
+        />
+        <Route
+          path="/support"
+          element={token ? <SupportPage /> : <Navigate to="/" />}
         />
 
         {/* Admin Dashboard */}
@@ -51,7 +119,7 @@ function AnimatedRoutes({ token, role, handleLogin, handleLogout }) {
             token && role === "admin" ? (
               <AdminDashboard token={token} logout={handleLogout} />
             ) : (
-              <Navigate to="/login" />
+              <Navigate to="/" />
             )
           }
         />
