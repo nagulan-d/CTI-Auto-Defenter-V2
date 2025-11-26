@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import ThreatCard from "./ThreatCardNew";
-import "../App.css";
+import Sidebar from "./ui/Sidebar";
+import "../styles/dashboard.css";
 
 function AdminDashboard({ logout }) {
   const [users, setUsers] = useState([]);
@@ -21,7 +22,7 @@ function AdminDashboard({ logout }) {
   const token = localStorage.getItem("token");  // Get token for API calls
   const role = localStorage.getItem("role") || "";
   const [currentView, setCurrentView] = useState("users"); // 'users' or 'threats'
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [collapsed, setCollapsed] = useState(false);
   const username = localStorage.getItem('username') || '';
   
 
@@ -98,53 +99,10 @@ function AdminDashboard({ logout }) {
   });
 
   return (
-  <div className="container" style={{ display: 'flex', gap: 24, background: '#0f172a', minHeight: '100vh', color: '#fff', padding: 24, boxSizing: 'border-box' }}>
-      <aside style={{ width: sidebarOpen ? 240 : 56, padding: 12, background: '#0f172a', color: '#fff', borderRadius: 8, transition: 'width 160ms ease' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: sidebarOpen ? 'space-between' : 'center' }}>
-          {sidebarOpen && <h2 style={{ margin: 0, fontSize: 18 }}>Admin</h2>}
-          <button onClick={() => setSidebarOpen((s) => !s)} aria-label="Toggle sidebar" title="Toggle sidebar" style={{ background: 'transparent', border: 'none', color: '#cbd5e1', cursor: 'pointer', padding: 6 }}>
-            {/* three-dot bars icon */}
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect x="3" y="5" width="18" height="2" rx="1" fill="#cbd5e1" />
-              <rect x="3" y="11" width="18" height="2" rx="1" fill="#cbd5e1" />
-              <rect x="3" y="17" width="18" height="2" rx="1" fill="#cbd5e1" />
-            </svg>
-          </button>
-        </div>
+    <div className="cp-root">
+      <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} username={username} role={role} onLogout={logout} />
 
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 14 }}>
-          <button onClick={() => setCurrentView('users')} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', borderRadius: 6, background: currentView === 'users' ? '#1e293b' : 'transparent', color: '#fff', border: 'none', cursor: 'pointer' }}>
-            <span style={{ width: 18, textAlign: 'center' }}>👥</span>
-            {sidebarOpen && <span>Registered Users</span>}
-          </button>
-          <button onClick={() => setCurrentView('subscribed')} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', borderRadius: 6, background: currentView === 'subscribed' ? '#1e293b' : 'transparent', color: '#fff', border: 'none', cursor: 'pointer' }}>
-            <span style={{ width: 18, textAlign: 'center' }}>✉️</span>
-            {sidebarOpen && <span>Subscribed Users</span>}
-          </button>
-          <button onClick={() => setCurrentView('unsubscribed')} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', borderRadius: 6, background: currentView === 'unsubscribed' ? '#1e293b' : 'transparent', color: '#fff', border: 'none', cursor: 'pointer' }}>
-            <span style={{ width: 18, textAlign: 'center' }}>🚫</span>
-            {sidebarOpen && <span>Unsubscribed Users</span>}
-          </button>
-          <button onClick={() => setCurrentView('threats')} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', borderRadius: 6, background: currentView === 'threats' ? '#1e293b' : 'transparent', color: '#fff', border: 'none', cursor: 'pointer' }}>
-            <span style={{ width: 18, textAlign: 'center' }}>⚠️</span>
-            {sidebarOpen && <span>Latest Threats</span>}
-          </button>
-        </nav>
-
-        <div style={{ flex: 1 }} />
-
-        <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 8, alignItems: sidebarOpen ? 'flex-start' : 'center' }}>
-          {sidebarOpen && (
-            <div style={{ color: '#cbd5e1' }}>
-              <div style={{ fontWeight: 600 }}>{username || '—'}</div>
-              <div style={{ fontSize: 12, color: '#9ca3af' }}>{role || 'guest'}</div>
-            </div>
-          )}
-          <button onClick={logout} style={{ width: '100%', padding: '8px 10px', borderRadius: 6, background: '#ef4444', color: '#fff', border: 'none', cursor: 'pointer' }}>{sidebarOpen ? 'Logout' : '⏻'}</button>
-        </div>
-      </aside>
-
-      <main style={{ flex: 1 }}>
+      <main className={"cp-main " + (collapsed ? 'collapsed' : '')}>
         <h1>Admin Dashboard</h1>
 
         {/* Users view */}

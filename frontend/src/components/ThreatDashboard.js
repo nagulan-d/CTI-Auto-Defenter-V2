@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from 'react-router-dom';
 import ThreatCard from "./ThreatCardNew";
-import "../App.css";
+import Sidebar from "./ui/Sidebar";
+import "../styles/dashboard.css";
 
 function ThreatDashboard({ logout }) {
   const [threats, setThreats] = useState([]);
@@ -12,9 +12,8 @@ function ThreatDashboard({ logout }) {
   const [error, setError] = useState(null);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [collapsed, setCollapsed] = useState(false);
   const username = localStorage.getItem('username') || '';
-  const navigate = useNavigate();
 
   // Fetch threats from backend
   useEffect(() => {
@@ -74,110 +73,66 @@ function ThreatDashboard({ logout }) {
   const usersOnline = users.length || 1;
 
   return (
-    <div className="container" style={{ display: 'flex', gap: 24 }}>
-      <aside style={{ width: sidebarOpen ? 240 : 56, padding: 12, background: '#0f172a', color: '#fff', borderRadius: 8, transition: 'width 160ms ease' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: sidebarOpen ? 'space-between' : 'center' }}>
-          {sidebarOpen && <h2 style={{ margin: 0, fontSize: 18 }}>Dashboard</h2>}
-          <button onClick={() => setSidebarOpen((s) => !s)} aria-label="Toggle sidebar" title="Toggle sidebar" style={{ background: 'transparent', border: 'none', color: '#cbd5e1', cursor: 'pointer', padding: 6 }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect x="3" y="5" width="18" height="2" rx="1" fill="#cbd5e1" />
-              <rect x="3" y="11" width="18" height="2" rx="1" fill="#cbd5e1" />
-              <rect x="3" y="17" width="18" height="2" rx="1" fill="#cbd5e1" />
-            </svg>
-          </button>
-        </div>
+    <div className="cp-root">
+      <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} username={username} role={role} onLogout={logout} />
 
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 14 }}>
-          <button onClick={() => navigate('/dashboard')} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', borderRadius: 6, background: 'transparent', color: '#fff', border: 'none', cursor: 'pointer' }}>
-            <span style={{ width: 18, textAlign: 'center' }}>🏠</span>
-            {sidebarOpen && <span>Overview</span>}
-          </button>
-          <button onClick={() => navigate('/threats')} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', borderRadius: 6, background: 'transparent', color: '#fff', border: 'none', cursor: 'pointer' }}>
-            <span style={{ width: 18, textAlign: 'center' }}>⚠️</span>
-            {sidebarOpen && <span>Threats</span>}
-          </button>
-          <button onClick={() => navigate('/sites')} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', borderRadius: 6, background: 'transparent', color: '#fff', border: 'none', cursor: 'pointer' }}>
-            <span style={{ width: 18, textAlign: 'center' }}>🗂️</span>
-            {sidebarOpen && <span>Sites</span>}
-          </button>
-          <button onClick={() => navigate('/publish')} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', borderRadius: 6, background: 'transparent', color: '#fff', border: 'none', cursor: 'pointer' }}>
-            <span style={{ width: 18, textAlign: 'center' }}>🚀</span>
-            {sidebarOpen && <span>Publish</span>}
-          </button>
-          <button onClick={() => navigate('/analytics')} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', borderRadius: 6, background: 'transparent', color: '#fff', border: 'none', cursor: 'pointer' }}>
-            <span style={{ width: 18, textAlign: 'center' }}>📊</span>
-            {sidebarOpen && <span>Analytics</span>}
-          </button>
-        </nav>
-
-        <div style={{ flex: 1 }} />
-        <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 8, alignItems: sidebarOpen ? 'flex-start' : 'center' }}>
-          {sidebarOpen && (
-            <div style={{ color: '#cbd5e1' }}>
-              <div style={{ fontWeight: 600 }}>{username || '—'}</div>
-              <div style={{ fontSize: 12, color: '#9ca3af' }}>{role || 'user'}</div>
-            </div>
-          )}
-          <button onClick={logout} style={{ width: '100%', padding: '8px 10px', borderRadius: 6, background: '#ef4444', color: '#fff', border: 'none', cursor: 'pointer' }}>{sidebarOpen ? 'Logout' : '⏻'}</button>
-        </div>
-      </aside>
-
-      <div style={{ flex: 1 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <h1>Security Dashboard</h1>
-        </div>
-
-        <div className="dashboard" style={{ gridTemplateColumns: '1fr' }}>
-          <div className="main-column">
-            <div className="metrics">
-              <div className="metric-card">
-                <h4>Active Threats</h4>
-                <div className="metric-value">{activeCount}</div>
-              </div>
-              <div className="metric-card">
-                <h4>Blocked IPs</h4>
-                <div className="metric-value">{blockedIPs ? blockedIPs : '1,245'}</div>
-              </div>
-              <div className="metric-card">
-                <h4>System Status</h4>
-                <div className="metric-value" style={{ color: '#10b981' }}>online</div>
-              </div>
-              <div className="metric-card">
-                <h4>Users Online</h4>
-                <div className="metric-value">{usersOnline}</div>
-              </div>
-            </div>
-
-            <div className="recent-panel">
-              <div className="controls" style={{ marginBottom: '12px' }}>
-                <input
-                  type="text"
-                  placeholder="Search threats..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  style={{ flex: 1 }}
-                />
-                <select value={filter} onChange={(e) => setFilter(e.target.value)}>
-                  <option value="all">All</option>
-                  <option value="low">Low Risk</option>
-                  <option value="medium">Medium Risk</option>
-                  <option value="high">High Risk</option>
-                </select>
-              </div>
-
-              <div className="grid">
-                {filteredThreats.length === 0 ? (
-                  <p>No matching threats found.</p>
-                ) : (
-                  filteredThreats.map((t, index) => (
-                    <ThreatCard key={index} threat={t} users={users} token={token} />
-                  ))
-                )}
-              </div>
-            </div>
+      <main className={"cp-main " + (collapsed ? 'collapsed' : '')}>
+        <div className="top-row">
+          <div>
+            <h1 className="page-title">Security Dashboard</h1>
+            <div className="muted">Summary of active threats and recent detections</div>
           </div>
         </div>
-      </div>
+
+        <section className="grid-4">
+          <div className="cp-card">
+            <h3>Active Threats</h3>
+            <div className="big-metric">{activeCount}</div>
+          </div>
+          <div className="cp-card">
+            <h3>Blocked IPs</h3>
+            <div className="small">{blockedIPs ? blockedIPs : '—'}</div>
+          </div>
+          <div className="cp-card">
+            <h3>System Status</h3>
+            <div className="small" style={{ color: '#10b981' }}>online</div>
+          </div>
+          <div className="cp-card">
+            <h3>Users Online</h3>
+            <div className="small">{usersOnline}</div>
+          </div>
+        </section>
+
+        <section>
+          <div className="cp-card">
+            <div className="controls" style={{ marginBottom: '12px', display: 'flex', gap: 8 }}>
+              <input
+                type="text"
+                placeholder="Search threats..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                style={{ flex: 1 }}
+              />
+              <select value={filter} onChange={(e) => setFilter(e.target.value)}>
+                <option value="all">All</option>
+                <option value="low">Low Risk</option>
+                <option value="medium">Medium Risk</option>
+                <option value="high">High Risk</option>
+              </select>
+            </div>
+
+            <div className="grid">
+              {filteredThreats.length === 0 ? (
+                <p>No matching threats found.</p>
+              ) : (
+                filteredThreats.map((t, index) => (
+                  <ThreatCard key={index} threat={t} users={users} token={token} />
+                ))
+              )}
+            </div>
+          </div>
+        </section>
+      </main>
     </div>
   );
 }
