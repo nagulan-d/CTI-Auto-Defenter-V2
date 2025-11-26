@@ -11,6 +11,8 @@ export default function Overview({ token, logout }) {
   const [otxFeed, setOtxFeed] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [filter, setFilter] = useState('all');
+  const [search, setSearch] = useState('');
 
   // simple polling for OTX (requires REACT_APP_OTX_KEY in env or localStorage 'otx_key')
   useEffect(() => {
@@ -66,42 +68,79 @@ export default function Overview({ token, logout }) {
 
         <section className="grid-4">
           <Card>
-            <h3>Threats Detected Today</h3>
-            <div className="big-metric">{Math.floor(Math.random() * 20)}</div>
+            <h3>Total OTX Items</h3>
+            <div className="big-metric">{otxFeed.length}</div>
           </Card>
           <Card>
-            <h3>OTX Sync Status</h3>
-            <div className="small">{loading ? 'Syncing…' : error ? 'Error' : 'OK'}</div>
+            <h3>OTX Status</h3>
+            <div className="small">{loading ? 'Syncing…' : error ? 'Error' : 'Connected'}</div>
             {error && <div className="error small">{error}</div>}
           </Card>
           <Card>
-            <h3>Latest Alerts</h3>
-            <div className="small">{otxFeed.length} recent</div>
+            <h3>Latest Threat</h3>
+            <div className="small">{otxFeed[0]?.title || '—'}</div>
+            <div className="feed-meta small">{otxFeed[0] ? new Date(otxFeed[0].ts || Date.now()).toLocaleString() : ''}</div>
           </Card>
           <Card>
-            <h3>Firewall Actions</h3>
-            <div className="small">{Math.floor(Math.random() * 100)}</div>
+            <h3>Filter</h3>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              <select value={filter} onChange={(e) => setFilter(e.target.value)}>
+                <option value="all">All categories</option>
+                <option value="high">High risk</option>
+                <option value="medium">Medium risk</option>
+                <option value="low">Low risk</option>
+              </select>
+            </div>
           </Card>
         </section>
 
         <section>
-          <h2>Live OTX Feed</h2>
-          <div className="feed">
-            {loading ? (
-              <div className="skeleton-list">
-                {[1,2,3,4].map(i => <div className="skeleton" key={i}></div>)}
-              </div>
-            ) : error ? (
-              <Card className="error-card"><div>Error loading OTX feed: {error}</div></Card>
-            ) : (
-              otxFeed.map((it, idx) => (
-                <Card key={idx} className="feed-item">
-                  <div className="feed-title">{it.title}</div>
-                  <div className="feed-meta">{it.category} • {new Date(it.ts || Date.now()).toLocaleString()}</div>
-                </Card>
-              ))
-            )}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <h2>Live OTX Feed</h2>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              <input placeholder="Search OTX feed..." value={search} onChange={(e) => setSearch(e.target.value)} style={{ padding: 8, borderRadius: 6, border: '1px solid rgba(255,255,255,0.04)', background: 'transparent', color: 'inherit' }} />
+              <button className="btn" onClick={() => { /* manual refresh */ window.location.reload(); }}>Refresh</button>
+            </div>
           </div>
+
+          {loading ? (
+            <div className="skeleton-list">
+              {[1,2,3,4].map(i => <div className="skeleton" key={i}></div>)}
+            </div>
+          ) : error ? (
+            <Card className="error-card"><div>Error loading OTX feed: {error}</div></Card>
+          ) : (
+            <div>
+              <div style={{ marginBottom: 8, color: 'var(--muted)' }}>Showing {otxFeed.length} items</div>
+              <div className="feed">
+                {otxFeed
+                  .filter(it => {
+                    if (filter === 'all') return true;
+                    if (['high','medium','low'].includes(filter)) return (it.trend || '').toLowerCase() === filter;
+                    return true;
+                  })
+                  .filter(it => {
+                    if (!search) return true;
+                    return (it.title || '').toLowerCase().includes(search.toLowerCase()) || (it.category || '').toLowerCase().includes(search.toLowerCase());
+                  })
+                  .map((it, idx) => (
+                    <Card key={idx} className="feed-item">
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div>
+                          <div className="feed-title">{it.title}</div>
+                          <div className="feed-meta">{it.category} • {new Date(it.ts || Date.now()).toLocaleString()}</div>
+                        </div>
+                        <div style={{ textAlign: 'right' }}>
+                          <div style={{ color: it.trend === 'high' ? '#ff6b6b' : it.trend === 'medium' ? '#ffb020' : 'var(--neon-green)', fontWeight: 700 }}>{it.trend}</div>
+                          <div style={{ fontSize: 12, color: 'var(--muted)' }}>{it.source || ''}</div>
+                        </div>
+                      </div>
+                      <div style={{ marginTop: 8, color: 'var(--muted)', fontSize: 13 }}>{it.description || ''}</div>
+                    </Card>
+                  ))}
+              </div>
+            </div>
+          )}
         </section>
       </main>
     </div>
